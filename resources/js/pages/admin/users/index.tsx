@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { CheckCircle2, MoreHorizontal, Plus, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -21,13 +21,13 @@ import {
 import CreateUserSheet from '@/components/admin/users/UserFormSheet';
 import { useState } from 'react';
 
-import { index as usersRoute } from '@/routes/admin/users';
+import { index as usersRoute, destroy } from '@/routes/admin/users';
 
 type User = {
     id: number;
     name: string;
     email: string;
-    is_active?: boolean;
+    is_active: boolean;
     email_verified_at?: string | null;
     created_at?: string;
 };
@@ -38,10 +38,17 @@ type UsersIndexProps = {
     };
 };
 
+import ConfirmDialog from '@/components/comman/ConfirmDialog';
+
 export default function Index({ users }: UsersIndexProps) {
 
     const [isUserFormOpen, setIsUserFormOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+    const [deleteUser, setDeleteUser] = useState<User | null>(null);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+
 
     const getInitials = (name: string) => {
         return (
@@ -67,6 +74,17 @@ export default function Index({ users }: UsersIndexProps) {
             return dateString;
         }
     };
+
+    const handleDelete = () => {
+        if (!deleteUser) return;
+
+        router.delete(destroy.url(deleteUser.id), {
+            onSuccess: () => {
+                setDeleteUser(null);
+                setIsDeleteOpen(false);
+            }
+        })
+    }
 
     return (
         <>
@@ -183,16 +201,25 @@ export default function Index({ users }: UsersIndexProps) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-32">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={''} className="cursor-pointer">
+                                                            <Button variant="ghost" className="cursor-pointer w-full text-center">
                                                                 View
-                                                            </Link>
+                                                            </Button>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
-                                                            <Button variant="ghost" onClick={()=>{
+                                                            <Button variant="ghost" onClick={() => {
                                                                 setSelectedUser(user);
                                                                 setIsUserFormOpen(true);
                                                             }} className="cursor-pointer w-full text-center">
                                                                 Edit
+                                                            </Button>
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem asChild>
+                                                            <Button variant="destructive" onClick={() => {
+                                                                setDeleteUser(user);
+                                                                setIsDeleteOpen(true);
+                                                            }} className="cursor-pointer w-full text-center">
+                                                                Delete
                                                             </Button>
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -207,6 +234,14 @@ export default function Index({ users }: UsersIndexProps) {
                 </div>
             </div>
             <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="min-w-2xl" />
+            <ConfirmDialog
+                open={isDeleteOpen}
+                onOpenChange={setIsDeleteOpen}
+                title="Delete User?"
+                description={`Are you sure you want to delete ${deleteUser?.name}? This action cannot be undone.`}
+                confirmText="Delete"
+                onConfirm={handleDelete}
+            />
         </>
     );
 }
