@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Lock, Mail, ShieldCheck, UserPlus, User } from 'lucide-react';
 import InputError from '@/components/input-error';
+import { cn } from '@/lib/utils';
 
 import { store, update } from '@/routes/admin/users'
 
@@ -84,16 +85,19 @@ export default function CreateUserSheet({
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent
                 side="right"
-                className={`flex h-full flex-col gap-0 p-0 sm:max-w-md ${className ?? ''}`}
+                className={cn(
+                    'flex h-full w-full flex-col gap-0 p-0 sm:max-w-md',
+                    className
+                )}
             >
                 {/* Header */}
-                <SheetHeader className="border-b border-border/70 px-6 py-5">
+                <SheetHeader className="border-b border-border/70 px-4 py-4 pr-12 sm:px-6 sm:py-5">
                     <div className="flex items-center gap-2.5">
-                        <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary dark:bg-primary/20">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary dark:bg-primary/20">
                             <UserPlus className="size-4" />
                         </div>
-                        <div>
-                            <SheetTitle className="text-lg font-semibold tracking-tight">
+                        <div className="min-w-0 flex-1">
+                            <SheetTitle className="truncate text-base font-semibold tracking-tight sm:text-lg">
                                 {user ? 'Edit User' : 'Add New User'}
                             </SheetTitle>
                             <SheetDescription className="text-xs text-muted-foreground">
@@ -108,7 +112,7 @@ export default function CreateUserSheet({
                     onSubmit={handleSubmit}
                     className="flex flex-1 flex-col justify-between overflow-y-auto"
                 >
-                    <div className="space-y-4 px-6 py-5">
+                    <div className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
                         {/* Name Field */}
                         <div className="space-y-1.5">
                             <Label htmlFor="name" className="text-xs font-medium text-foreground">
@@ -238,18 +242,18 @@ export default function CreateUserSheet({
                     </div>
 
                     {/* Footer Actions */}
-                    <SheetFooter className="border-t border-border/70 bg-muted/20 px-6 py-4 sm:flex-row sm:justify-end sm:gap-2.5">
+                    <SheetFooter className="border-t border-border/70 bg-muted/20 px-4 py-4 sm:flex-row sm:justify-end sm:gap-2.5 sm:px-6">
                         <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="h-9"
+                            className="h-9 w-full sm:w-auto"
                             onClick={() => onOpenChange(false)}
                         >
                             Cancel
                         </Button>
 
-                        <Button disabled={processing} type="submit" size="sm" className="h-9 gap-1.5 shadow-xs">
+                        <Button disabled={processing} type="submit" size="sm" className="h-9 w-full gap-1.5 shadow-xs sm:w-auto">
                             <UserPlus className="size-4" />
                             <span>{processing ? user ? 'Updating...' : 'Creating...' : user ? 'Update User' : 'Create User'}</span>
                         </Button>

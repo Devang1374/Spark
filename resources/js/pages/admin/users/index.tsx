@@ -233,7 +233,7 @@ export default function Index({ users }: UsersIndexProps) {
                     </div>
                 </div>
             </div>
-            <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="min-w-2xl" />
+            <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="w-full sm:max-w-xl md:min-w-2xl" />
             <ConfirmDialog
                 open={isDeleteOpen}
                 onOpenChange={setIsDeleteOpen}
