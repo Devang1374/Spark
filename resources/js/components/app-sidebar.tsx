@@ -22,7 +22,7 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
-    },{
+    }, {
         title: 'Users',
         href: index(),
         // add working icon for users tab

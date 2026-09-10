@@ -249,6 +249,7 @@ export default function CreateUserSheet({
                             size="sm"
                             className="h-9 w-full sm:w-auto"
                             onClick={() => onOpenChange(false)}
+                            disabled={processing}
                         >
                             Cancel
                         </Button>

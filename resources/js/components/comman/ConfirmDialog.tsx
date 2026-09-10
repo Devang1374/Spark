@@ -16,7 +16,8 @@ type ConfirmDialogProps = {
     description?: string;
     confirmText?: string;
     cancelText?: string;
-    onConfirm: () => void;
+    onConfirm: () => void | Promise<void>;
+    processing?: boolean;
 };
 
 export default function ConfirmDialog({
@@ -27,6 +28,7 @@ export default function ConfirmDialog({
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     onConfirm,
+    processing = false,
 }: ConfirmDialogProps) {
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -42,12 +44,15 @@ export default function ConfirmDialog({
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel>
+                    <AlertDialogCancel disabled={processing}>
                         {cancelText}
                     </AlertDialogCancel>
 
-                    <AlertDialogAction onClick={onConfirm}>
-                        {confirmText}
+                    <AlertDialogAction onClick={(e) => {
+                        e.preventDefault();
+                        onConfirm();
+                    }} disabled={processing}>
+                        {processing ? 'processing...' : confirmText}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

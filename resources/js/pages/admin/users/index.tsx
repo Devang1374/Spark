@@ -22,6 +22,7 @@ import CreateUserSheet from '@/components/admin/users/UserFormSheet';
 import { useState } from 'react';
 
 import { index as usersRoute, destroy } from '@/routes/admin/users';
+import { useForm } from '@inertiajs/react';
 
 type User = {
     id: number;
@@ -47,6 +48,7 @@ export default function Index({ users }: UsersIndexProps) {
 
     const [deleteUser, setDeleteUser] = useState<User | null>(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const { delete: deleteRequest, processing: deleting } = useForm();
 
 
 
@@ -78,10 +80,12 @@ export default function Index({ users }: UsersIndexProps) {
     const handleDelete = () => {
         if (!deleteUser) return;
 
-        router.delete(destroy.url(deleteUser.id), {
+        deleteRequest(destroy.url(deleteUser.id), {
             onSuccess: () => {
                 setDeleteUser(null);
-                setIsDeleteOpen(false);
+
+                if(!deleting)
+                    setIsDeleteOpen(false);
             }
         })
     }
@@ -233,6 +237,7 @@ export default function Index({ users }: UsersIndexProps) {
                     </div>
                 </div>
             </div>
+            <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="min-w-2xl" />
             <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="w-full sm:max-w-xl md:min-w-2xl" />
             <ConfirmDialog
                 open={isDeleteOpen}
@@ -241,6 +246,7 @@ export default function Index({ users }: UsersIndexProps) {
                 description={`Are you sure you want to delete ${deleteUser?.name}? This action cannot be undone.`}
                 confirmText="Delete"
                 onConfirm={handleDelete}
+                processing={deleting}
             />
         </>
     );
