@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
-use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -17,12 +15,21 @@ class UserController extends Controller
         $users = User::with('roles')->latest()->paginate(10);
         $roles = Role::orderBy('name')->get([
             'id',
-            'name'
+            'name',
         ]);
 
         return inertia('admin/users/index', [
             'users' => $users,
             'roles' => $roles,
+        ]);
+    }
+
+    public function show(User $user)
+    {
+        $user->load('roles');
+
+        return inertia('admin/users/show', [
+            'user' => $user,
         ]);
     }
 

@@ -21,7 +21,7 @@ import {
 import CreateUserSheet from '@/components/admin/users/UserFormSheet';
 import { useState } from 'react';
 
-import { index as usersRoute, destroy } from '@/routes/admin/users';
+import { index as usersRoute, destroy, show } from '@/routes/admin/users';
 import { useForm } from '@inertiajs/react';
 
 type User = {
@@ -219,9 +219,12 @@ export default function Index({ users, roles }: UsersIndexProps) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-32">
                                                         <DropdownMenuItem asChild>
-                                                            <Button variant="ghost" className="cursor-pointer w-full text-center">
+                                                            <Link
+                                                                href={show.url(user.id)}
+                                                                className="flex w-full cursor-pointer items-center justify-center py-1.5 text-sm font-medium text-foreground hover:bg-accent"
+                                                            >
                                                                 View
-                                                            </Button>
+                                                            </Link>
                                                         </DropdownMenuItem>
                                                         {canUpdate && (
                                                             <DropdownMenuItem asChild>
