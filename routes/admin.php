@@ -11,6 +11,9 @@ Route::middleware(['auth', 'verified'])
     ->group(function () {
         Route::inertia('dashboard', 'admin/dashboard')->name('dashboard');
 
-        Route::resource('users', UserController::class);
-
+        Route::resource('users', UserController::class)
+            ->middlewareFor('index', 'can:users.view')
+            ->middlewareFor('store', 'can:users.create')
+            ->middlewareFor('edit', 'can:users.update')
+            ->middlewareFor('destroy', 'can:users.delete');
     });

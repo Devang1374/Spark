@@ -8,13 +8,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::latest()->paginate(10);
-        return inertia('admin/users/index', ['users' => $users]);
+        $users = User::with('roles')->latest()->paginate(10);
+        $roles = Role::orderBy('name')->get([
+            'id',
+            'name'
+        ]);
+
+        return inertia('admin/users/index', [
+            'users' => $users,
+            'roles' => $roles,
+        ]);
     }
 
     public function store(Request $request)
@@ -24,11 +33,16 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'is_active' => ['boolean'],
+            'role_id' => ['required', 'exists:roles,id'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        $user->assignRole(
+            Role::findOrFail($validated['role_id'])
+        );
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
@@ -40,6 +54,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'is_active' => ['boolean'],
+            'role_id' => ['required', 'exists:roles,id'],
         ]);
 
         if (isset($validated['password'])) {
@@ -50,6 +65,10 @@ class UserController extends Controller
 
         $user->update($validated);
 
+        $user->syncRoles(
+            Role::findOrFail($validated['role_id'])
+        );
+
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
@@ -59,6 +78,4 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
-
-
 }

@@ -9,11 +9,20 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Lock, Mail, ShieldCheck, UserPlus, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Shield, ShieldCheck, UserPlus, User } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { cn } from '@/lib/utils';
 
@@ -24,17 +33,25 @@ type User = {
     name: string;
     email: string;
     is_active: boolean;
+    roles: role[];
 };
+
+type role = {
+    id: number;
+    name: string;
+}
 
 export default function CreateUserSheet({
     open,
     onOpenChange,
     user,
+    roles,
     className,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     user?: User | null;
+    roles: role[];
     className?: string;
 }) {
     const { data, setData, post, put, processing, errors, reset } = useForm({
@@ -43,6 +60,7 @@ export default function CreateUserSheet({
         password: '',
         password_confirmation: '',
         is_active: user?.is_active ?? true,
+        role_id: user?.roles?.[0]?.id?.toString() ?? '',
     });
 
     useEffect(() => {
@@ -52,6 +70,7 @@ export default function CreateUserSheet({
             password: '',
             password_confirmation: '',
             is_active: user?.is_active ?? true,
+            role_id: user?.roles?.[0]?.id?.toString() ?? '',
         })
     }, [user, open]);
 
@@ -214,6 +233,36 @@ export default function CreateUserSheet({
                                 </button>
                             </div>
                             <InputError message={errors.password_confirmation} />
+                        </div>
+
+                        {/* Role */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="role" className="text-xs font-medium text-foreground">
+                                Role
+                            </Label>
+                            <div className="relative">
+                                <Shield className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground/70" />
+                                <Select
+                                    value={data.role_id}
+                                    onValueChange={(value) => setData('role_id', value)}
+                                >
+                                    <SelectTrigger id="role" className="h-9.5 w-full pl-9 text-sm">
+                                        <SelectValue placeholder="Select a role" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {roles.map((role) => (
+                                            <SelectItem
+                                                key={role.id}
+                                                value={role.id.toString()}
+                                            >
+                                                {role.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <InputError message={errors.role_id} />
                         </div>
 
                         {/* Status Toggle Card */}

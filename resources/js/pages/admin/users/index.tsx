@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CheckCircle2, MoreHorizontal, Plus, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -33,15 +33,21 @@ type User = {
     created_at?: string;
 };
 
+type roles = {
+    id: number;
+    name: string;
+}
+
 type UsersIndexProps = {
     users: {
         data: User[];
     };
+    roles: roles[];
 };
 
 import ConfirmDialog from '@/components/comman/ConfirmDialog';
 
-export default function Index({ users }: UsersIndexProps) {
+export default function Index({ users, roles }: UsersIndexProps) {
 
     const [isUserFormOpen, setIsUserFormOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -50,7 +56,15 @@ export default function Index({ users }: UsersIndexProps) {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const { delete: deleteRequest, processing: deleting } = useForm();
 
+    const auth = (usePage().props as unknown as {
+        auth?: {
+            permissions?: string[];
+        };
+    }).auth ?? {};
 
+    const canCreate = auth.permissions?.includes('users.create') ?? false;
+    const canUpdate = auth.permissions?.includes('users.update') ?? false;
+    const canDelete = auth.permissions?.includes('users.delete') ?? false;
 
     const getInitials = (name: string) => {
         return (
@@ -83,9 +97,7 @@ export default function Index({ users }: UsersIndexProps) {
         deleteRequest(destroy.url(deleteUser.id), {
             onSuccess: () => {
                 setDeleteUser(null);
-
-                if(!deleting)
-                    setIsDeleteOpen(false);
+                setIsDeleteOpen(false);
             }
         })
     }
@@ -106,13 +118,15 @@ export default function Index({ users }: UsersIndexProps) {
                         </p>
                     </div>
 
-                    <Button onClick={() => {
-                        setSelectedUser(null);
-                        setIsUserFormOpen(true);
-                    }} className="gap-2">
-                        <Plus className="size-4" />
-                        <span>Add User</span>
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={() => {
+                            setSelectedUser(null);
+                            setIsUserFormOpen(true);
+                        }} className="gap-2">
+                            <Plus className="size-4" />
+                            <span>Add User</span>
+                        </Button>
+                    )}
                 </div>
 
                 {/* Table Container */}
@@ -209,23 +223,27 @@ export default function Index({ users }: UsersIndexProps) {
                                                                 View
                                                             </Button>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <Button variant="ghost" onClick={() => {
-                                                                setSelectedUser(user);
-                                                                setIsUserFormOpen(true);
-                                                            }} className="cursor-pointer w-full text-center">
-                                                                Edit
-                                                            </Button>
-                                                        </DropdownMenuItem>
+                                                        {canUpdate && (
+                                                            <DropdownMenuItem asChild>
+                                                                <Button variant="ghost" onClick={() => {
+                                                                    setSelectedUser(user);
+                                                                    setIsUserFormOpen(true);
+                                                                }} className="cursor-pointer w-full text-center">
+                                                                    Edit
+                                                                </Button>
+                                                            </DropdownMenuItem>
+                                                        )}
 
-                                                        <DropdownMenuItem asChild>
-                                                            <Button variant="destructive" onClick={() => {
-                                                                setDeleteUser(user);
-                                                                setIsDeleteOpen(true);
-                                                            }} className="cursor-pointer w-full text-center">
-                                                                Delete
-                                                            </Button>
-                                                        </DropdownMenuItem>
+                                                        {canDelete && (
+                                                            <DropdownMenuItem asChild>
+                                                                <Button variant="destructive" onClick={() => {
+                                                                    setDeleteUser(user);
+                                                                    setIsDeleteOpen(true);
+                                                                }} className="cursor-pointer w-full text-center">
+                                                                    Delete
+                                                                </Button>
+                                                            </DropdownMenuItem>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
@@ -237,8 +255,7 @@ export default function Index({ users }: UsersIndexProps) {
                     </div>
                 </div>
             </div>
-            <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="min-w-2xl" />
-            <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} className="w-full sm:max-w-xl md:min-w-2xl" />
+            <CreateUserSheet open={isUserFormOpen} onOpenChange={setIsUserFormOpen} user={selectedUser} roles={roles} className="w-full sm:max-w-xl md:min-w-2xl" />
             <ConfirmDialog
                 open={isDeleteOpen}
                 onOpenChange={setIsDeleteOpen}
