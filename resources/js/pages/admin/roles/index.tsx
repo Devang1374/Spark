@@ -18,7 +18,7 @@ import { MoreHorizontal, Plus, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import RoleFormSheet from '@/components/admin/roles/roleFormSheet';
+import RoleFormSheet from '@/components/admin/roles/RoleFormSheet'
 
 type Role = {
     id: number;
@@ -63,7 +63,7 @@ export default function Index({
                         </p>
                     </div>
 
-                    <Button onClick={() => {setIsRoleFormOpen(true)}} className="gap-2">
+                    <Button onClick={() => { setIsRoleFormOpen(true) }} className="gap-2">
                         <Plus className="size-4" />
                         <span>Add Role</span>
                     </Button>
