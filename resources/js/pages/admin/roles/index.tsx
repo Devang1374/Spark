@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { index } from '@/routes/admin/roles';
 import {
     Table,
@@ -19,6 +19,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import RoleFormSheet from '@/components/admin/roles/RoleFormSheet'
+import ConfirmDialog from '@/components/comman/ConfirmDialog';
+import { destroy } from '@/routes/admin/roles';
 
 type Role = {
     id: number;
@@ -26,14 +28,37 @@ type Role = {
     guard_name?: string;
     users_count?: number;
     created_at?: string;
+    permissions: Permission[];
 };
 
+type Permission = {
+    id: number;
+    name: string;
+}; // Add this typ
+
 export default function Index({
-    roles = []
+    roles = [],
+    permissions = [],
 }: {
     roles: Role[];
+    permissions: Permission[];
 }) {
     const [isRoleFormOpen, setIsRoleFormOpen] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const { delete: deleteRequest, processing: deleting } = useForm();
+    const [deleteRole, setDeleteRole] = useState<Role | null>(null);
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+
+    const handleDelete = () => {
+        if (!deleteRole) return;
+
+        deleteRequest(destroy.url(deleteRole.id), {
+            onSuccess: () => {
+                setDeleteRole(null);
+                setIsDeleteOpen(false);
+            }
+        })
+    }
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return '—';
@@ -63,7 +88,10 @@ export default function Index({
                         </p>
                     </div>
 
-                    <Button onClick={() => { setIsRoleFormOpen(true) }} className="gap-2">
+                    <Button onClick={() => {
+                        setIsRoleFormOpen(true);
+                        setSelectedRole(null);
+                    }} className="gap-2">
                         <Plus className="size-4" />
                         <span>Add Role</span>
                     </Button>
@@ -133,17 +161,18 @@ export default function Index({
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-32">
                                                         <DropdownMenuItem asChild>
-                                                            <Button variant="ghost" className="cursor-pointer w-full text-center">
-                                                                View
-                                                            </Button>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <Button variant="ghost" className="cursor-pointer w-full text-center">
+                                                            <Button onClick={() => {
+                                                                setIsRoleFormOpen(true);
+                                                                setSelectedRole(role);
+                                                            }} variant="ghost" className="cursor-pointer w-full text-center">
                                                                 Edit
                                                             </Button>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
-                                                            <Button variant="destructive" className="cursor-pointer w-full text-center">
+                                                            <Button onClick={() => {
+                                                                setDeleteRole(role);
+                                                                setIsDeleteOpen(true);
+                                                            }} variant="destructive" className="cursor-pointer w-full text-center">
                                                                 Delete
                                                             </Button>
                                                         </DropdownMenuItem>
@@ -158,7 +187,16 @@ export default function Index({
                     </div>
                 </div>
             </div>
-            <RoleFormSheet open={isRoleFormOpen} onOpenChange={setIsRoleFormOpen} />
+            <RoleFormSheet open={isRoleFormOpen} onOpenChange={setIsRoleFormOpen} permissions={permissions} role={selectedRole} className='lg:min-w-2xl' />
+            <ConfirmDialog
+                open={isDeleteOpen}
+                onOpenChange={setIsDeleteOpen}
+                title="Delete Role?"
+                description={`Are you sure you want to delete ${deleteRole?.name}? This action cannot be undone.`}
+                confirmText="Delete"
+                onConfirm={handleDelete}
+                processing={deleting}
+            />
         </>
     );
 }
