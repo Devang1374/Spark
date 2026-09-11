@@ -29,6 +29,7 @@ type User = {
     name: string;
     email: string;
     is_active: boolean;
+    roles: roles[];
     email_verified_at?: string | null;
     created_at?: string;
 };

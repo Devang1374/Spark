@@ -17,6 +17,8 @@ import {
 import { MoreHorizontal, Plus, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import RoleFormSheet from '@/components/admin/roles/roleFormSheet';
 
 type Role = {
     id: number;
@@ -31,6 +33,8 @@ export default function Index({
 }: {
     roles: Role[];
 }) {
+    const [isRoleFormOpen, setIsRoleFormOpen] = useState(false);
+
     const formatDate = (dateString?: string) => {
         if (!dateString) return '—';
         try {
@@ -59,7 +63,7 @@ export default function Index({
                         </p>
                     </div>
 
-                    <Button className="gap-2">
+                    <Button onClick={() => {setIsRoleFormOpen(true)}} className="gap-2">
                         <Plus className="size-4" />
                         <span>Add Role</span>
                     </Button>
@@ -154,6 +158,7 @@ export default function Index({
                     </div>
                 </div>
             </div>
+            <RoleFormSheet open={isRoleFormOpen} onOpenChange={setIsRoleFormOpen} />
         </>
     );
 }
