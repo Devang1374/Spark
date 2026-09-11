@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sheet";
 
 import { cn } from "@/lib/utils";
-import { Shield, UserPlus } from "lucide-react";
+import { Shield, ShieldCheck } from "lucide-react";
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -63,7 +63,7 @@ export default function RoleFormSheet({ className, open, onOpenChange }: RoleFor
                 <SheetHeader className="border-b border-border/70 px-4 py-4 pr-12 sm:px-6 sm:py-5">
                     <div className="flex items-center gap-2.5">
                         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary dark:bg-primary/20">
-                            <UserPlus className="size-4" />
+                            <ShieldCheck className="size-4" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <SheetTitle className="truncate text-base font-semibold tracking-tight sm:text-lg">
@@ -117,7 +117,7 @@ export default function RoleFormSheet({ className, open, onOpenChange }: RoleFor
                         </Button>
 
                         <Button disabled={processing} type="submit" size="sm" className="h-9 w-full gap-1.5 shadow-xs sm:w-auto">
-                            <UserPlus className="size-4" />
+                            <ShieldCheck className="size-4" />
                             <span>{processing ? 'Creating...' : 'Create Role'}</span>
                         </Button>
                     </SheetFooter>
