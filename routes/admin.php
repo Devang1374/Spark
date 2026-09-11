@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,4 +16,6 @@ Route::middleware(['auth', 'verified'])
             ->middlewareFor('store', 'can:users.create')
             ->middlewareFor('edit', 'can:users.update')
             ->middlewareFor('destroy', 'can:users.delete');
+
+        Route::resource('roles', RoleController::class);
     });
