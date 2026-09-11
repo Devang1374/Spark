@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { CheckCircle2, MoreHorizontal, Plus, XCircle } from 'lucide-react';
+import { CheckCircle2, Eye, MoreHorizontal, Plus, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -207,49 +207,57 @@ export default function Index({ users, roles }: UsersIndexProps) {
                                                 {formatDate(user.created_at)}
                                             </TableCell>
                                             <TableCell className="py-3.5 pr-6 text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="size-8 text-muted-foreground hover:text-foreground"
-                                                        >
-                                                            <MoreHorizontal className="size-4" />
-                                                            <span className="sr-only">Actions</span>
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-32">
-                                                        <DropdownMenuItem asChild>
-                                                            <Link
-                                                                href={show.url(user.id)}
-                                                                className="flex w-full cursor-pointer items-center justify-center py-1.5 text-sm font-medium text-foreground hover:bg-accent"
-                                                            >
-                                                                View
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                        {canUpdate && (
-                                                            <DropdownMenuItem asChild>
-                                                                <Button variant="ghost" onClick={() => {
-                                                                    setSelectedUser(user);
-                                                                    setIsUserFormOpen(true);
-                                                                }} className="cursor-pointer w-full text-center">
-                                                                    Edit
-                                                                </Button>
-                                                            </DropdownMenuItem>
-                                                        )}
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Button
+                                                        asChild
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-8 text-muted-foreground hover:text-foreground"
+                                                    >
+                                                        <Link href={show.url(user.id)}>
+                                                            <Eye className="size-4" />
+                                                            <span className="sr-only">View</span>
+                                                        </Link>
+                                                    </Button>
 
-                                                        {canDelete && (
-                                                            <DropdownMenuItem asChild>
-                                                                <Button variant="destructive" onClick={() => {
-                                                                    setDeleteUser(user);
-                                                                    setIsDeleteOpen(true);
-                                                                }} className="cursor-pointer w-full text-center">
-                                                                    Delete
+                                                    {(canUpdate || canDelete) && (
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="size-8 text-muted-foreground hover:text-foreground"
+                                                                >
+                                                                    <MoreHorizontal className="size-4" />
+                                                                    <span className="sr-only">Actions</span>
                                                                 </Button>
-                                                            </DropdownMenuItem>
-                                                        )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="w-32">
+                                                                {canUpdate && (
+                                                                    <DropdownMenuItem asChild>
+                                                                        <Button variant="ghost" onClick={() => {
+                                                                            setSelectedUser(user);
+                                                                            setIsUserFormOpen(true);
+                                                                        }} className="cursor-pointer w-full text-center">
+                                                                            Edit
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                )}
+
+                                                                {canDelete && (
+                                                                    <DropdownMenuItem asChild>
+                                                                        <Button variant="destructive" onClick={() => {
+                                                                            setDeleteUser(user);
+                                                                            setIsDeleteOpen(true);
+                                                                        }} className="cursor-pointer w-full text-center">
+                                                                            Delete
+                                                                        </Button>
+                                                                    </DropdownMenuItem>
+                                                                )}
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))
