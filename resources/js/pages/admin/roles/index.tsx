@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { index } from '@/routes/admin/roles';
 import {
     Table,
@@ -27,6 +27,7 @@ type Role = {
     name: string;
     guard_name?: string;
     users_count?: number;
+    permissions_count?: number;
     created_at?: string;
     permissions: Permission[];
 };
@@ -48,6 +49,16 @@ export default function Index({
     const { delete: deleteRequest, processing: deleting } = useForm();
     const [deleteRole, setDeleteRole] = useState<Role | null>(null);
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+
+    const auth = (usePage().props as unknown as {
+        auth?: {
+            permissions?: string[];
+        };
+    }).auth ?? {};
+
+    const canCreate = auth.permissions?.includes('roles.create') ?? false;
+    const canUpdate = auth.permissions?.includes('roles.update') ?? false;
+    const canDelete = auth.permissions?.includes('roles.delete') ?? false;
 
     const handleDelete = () => {
         if (!deleteRole) return;
@@ -87,14 +98,15 @@ export default function Index({
                             Manage system roles and their assigned access.
                         </p>
                     </div>
-
-                    <Button onClick={() => {
-                        setIsRoleFormOpen(true);
-                        setSelectedRole(null);
-                    }} className="gap-2">
-                        <Plus className="size-4" />
-                        <span>Add Role</span>
-                    </Button>
+                    {canCreate && (
+                        <Button onClick={() => {
+                            setIsRoleFormOpen(true);
+                            setSelectedRole(null);
+                        }} className="gap-2">
+                            <Plus className="size-4" />
+                            <span>Add Role</span>
+                        </Button>
+                    )}
                 </div>
 
                 {/* Table Container */}
@@ -106,15 +118,18 @@ export default function Index({
                                     <TableHead className="py-3.5 pl-6 font-semibold">Role Name</TableHead>
                                     <TableHead className="py-3.5 font-semibold">Guard</TableHead>
                                     <TableHead className="py-3.5 font-semibold">Users</TableHead>
+                                    <TableHead className="py-3.5 font-semibold">Permissions</TableHead>
                                     <TableHead className="py-3.5 font-semibold">Created</TableHead>
-                                    <TableHead className="py-3.5 pr-6 text-right font-semibold">Actions</TableHead>
+                                    {(canUpdate || canDelete) && (
+                                        <TableHead className="py-3.5 pr-6 text-right font-semibold">Actions</TableHead>
+                                    )}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {roles.length === 0 ? (
                                     <TableRow>
                                         <TableCell
-                                            colSpan={5}
+                                            colSpan={6}
                                             className="h-28 text-center text-muted-foreground"
                                         >
                                             No roles available.
@@ -144,41 +159,55 @@ export default function Index({
                                                     {role.users_count ?? 0} {role.users_count === 1 ? 'user' : 'users'}
                                                 </Badge>
                                             </TableCell>
+                                            <TableCell className="py-3.5">
+                                                <Badge variant="outline" className="text-xs">
+                                                    {role.permissions_count ?? role.permissions?.length ?? 0} {(role.permissions_count ?? role.permissions?.length ?? 0) === 1 ? 'permission' : 'permissions'}
+                                                </Badge>
+                                            </TableCell>
                                             <TableCell className="py-3.5 text-sm text-muted-foreground">
                                                 {formatDate(role.created_at)}
                                             </TableCell>
-                                            <TableCell className="py-3.5 pr-6 text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="size-8 text-muted-foreground hover:text-foreground"
-                                                        >
-                                                            <MoreHorizontal className="size-4" />
-                                                            <span className="sr-only">Actions</span>
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-32">
-                                                        <DropdownMenuItem asChild>
-                                                            <Button onClick={() => {
-                                                                setIsRoleFormOpen(true);
-                                                                setSelectedRole(role);
-                                                            }} variant="ghost" className="cursor-pointer w-full text-center">
-                                                                Edit
+                                            {(canUpdate || canDelete) && (
+                                                <TableCell className="py-3.5 pr-6 text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="size-8 text-muted-foreground hover:text-foreground"
+                                                            >
+                                                                <MoreHorizontal className="size-4" />
+                                                                <span className="sr-only">Actions</span>
                                                             </Button>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <Button onClick={() => {
-                                                                setDeleteRole(role);
-                                                                setIsDeleteOpen(true);
-                                                            }} variant="destructive" className="cursor-pointer w-full text-center">
-                                                                Delete
-                                                            </Button>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
+                                                        </DropdownMenuTrigger>
+
+                                                        <DropdownMenuContent align="end" className="w-32">
+                                                            {canUpdate && (
+                                                                <DropdownMenuItem asChild>
+                                                                    <Button onClick={() => {
+                                                                        setIsRoleFormOpen(true);
+                                                                        setSelectedRole(role);
+                                                                    }} variant="ghost" className="cursor-pointer w-full text-center">
+                                                                        Edit
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                            )}
+
+                                                            {canDelete && (
+                                                                <DropdownMenuItem asChild>
+                                                                    <Button onClick={() => {
+                                                                        setDeleteRole(role);
+                                                                        setIsDeleteOpen(true);
+                                                                    }} variant="destructive" className="cursor-pointer w-full text-center">
+                                                                        Delete
+                                                                    </Button>
+                                                                </DropdownMenuItem>
+                                                            )}
+                                                        </DropdownMenuContent>
+
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            )}
                                         </TableRow>
                                     ))
                                 )}

@@ -17,5 +17,10 @@ Route::middleware(['auth', 'verified'])
             ->middlewareFor('edit', 'can:users.update')
             ->middlewareFor('destroy', 'can:users.delete');
 
-        Route::resource('roles', RoleController::class);
+        Route::resource('roles', RoleController::class)
+            ->middlewareFor('index', 'can:roles.view')
+            ->middlewareFor('store', 'can:roles.create')
+            ->middlewareFor('update', 'can:roles.update')
+            ->middlewareFor('destroy', 'can:roles.delete')
+        ;
     });

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, FolderGit2, LayoutGrid, ShieldCheck, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -18,23 +18,6 @@ import { index } from '@/routes/admin/users';
 import type { NavItem } from '@/types';
 import roles from '@/routes/admin/roles';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    }, {
-        title: 'Users',
-        href: index(),
-        // add working icon for users tab
-        icon: Users,
-    }, {
-        title: 'Roles',
-        href: roles.index(),
-        icon: ShieldCheck,
-    },
-];
-
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -48,7 +31,41 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+const getMainNavItems = (permissions: string[]): NavItem[] => [
+    {
+        title: 'Dashboard',
+        href: dashboard(),
+        icon: LayoutGrid,
+    },
+    ...(permissions.includes('users.view')
+        ? [
+            {
+                title: 'Users',
+                href: index(),
+                icon: Users,
+            },
+        ]
+        : []),
+    ...(permissions.includes('roles.view')
+        ? [
+            {
+                title: 'Roles',
+                href: roles.index(),
+                icon: ShieldCheck,
+            },
+        ]
+        : []),
+];
+
 export function AppSidebar() {
+    const auth = (usePage().props as unknown as {
+        auth?: {
+            permissions?: string[];
+        };
+    }).auth ?? {};
+
+    const mainNavItems = getMainNavItems(auth.permissions ?? []);
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
