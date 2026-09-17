@@ -8,6 +8,7 @@ enum Permission: string
     case UsersCreate = 'users.create';
     case UsersUpdate = 'users.update';
     case UsersDelete = 'users.delete';
+    case UsersStatus = 'users.status';
 
     case RolesView = 'roles.view';
     case RolesCreate = 'roles.create';
@@ -20,7 +21,8 @@ enum Permission: string
             self::UsersView,
             self::UsersCreate,
             self::UsersUpdate,
-            self::UsersDelete => 'Users',
+            self::UsersDelete,
+            self::UsersStatus => 'Users',
 
             self::RolesView,
             self::RolesCreate,
@@ -43,6 +45,8 @@ enum Permission: string
 
             self::UsersDelete,
             self::RolesDelete => 'Delete',
+
+            self::UsersStatus => 'Status',
         };
     }
 }

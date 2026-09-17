@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Spatie\Permission\Models\Permission as SpatiePermission;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Spatie\Permission\Models\Role;
-use Illuminate\Database\Seeder;
 use App\Enums\Permission;
 use App\Enums\Role as RoleEnum;
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission as SpatiePermission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -41,6 +40,7 @@ class RolePermissionSeeder extends Seeder
             Permission::UsersView->value,
             Permission::UsersCreate->value,
             Permission::UsersUpdate->value,
+            Permission::UsersStatus->value,
         ]);
 
         $moderator->syncPermissions([

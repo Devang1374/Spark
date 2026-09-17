@@ -58,7 +58,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'is_active' => ['boolean'],
             'role_id' => ['required', 'exists:roles,id'],
@@ -84,5 +84,17 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function status(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot change your own status.');
+        }
+
+        $user->is_active = ! $user->is_active;
+        $user->save();
+
+        return back()->with('success', 'User status updated successfully.');
     }
 }

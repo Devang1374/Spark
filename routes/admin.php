@@ -17,10 +17,13 @@ Route::middleware(['auth', 'verified'])
             ->middlewareFor('edit', 'can:users.update')
             ->middlewareFor('destroy', 'can:users.delete');
 
+        Route::patch('users/{user}/status', [UserController::class, 'status'])
+            ->name('users.status')
+            ->middleware('can:users.status');
+
         Route::resource('roles', RoleController::class)
             ->middlewareFor('index', 'can:roles.view')
             ->middlewareFor('store', 'can:roles.create')
             ->middlewareFor('update', 'can:roles.update')
-            ->middlewareFor('destroy', 'can:roles.delete')
-        ;
+            ->middlewareFor('destroy', 'can:roles.delete');
     });
