@@ -31,11 +31,12 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force || true
 fi
 
-# Run migrations if enabled or if using fresh database
-if [ "$RUN_MIGRATIONS" = "true" ] || [ ! -s "/var/www/html/database/database.sqlite" ]; then
-    echo "Running database migrations..."
-    php artisan migrate --force || true
-fi
+# Run migrations and seed on every deploy
+echo "Running database migrations..."
+php artisan migrate --force || true
+echo "Seeding database..."
+php artisan db:seed --force || true
+
 
 # Clear old cache and warm up new cache
 php artisan config:clear || true
